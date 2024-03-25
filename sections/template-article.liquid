@@ -1,0 +1,154 @@
+<article class="py-8">
+
+{% for block in section.blocks %}
+    {% case block.type %}
+        {% when 'article_title' %}
+            <div class="flex items-center justify-center">
+                <div class="max-w-7xl text-center">
+                    <a href="{{ blog_url }}" class="text-base uppercase text-gray-500 hover:text-gray-900 font-bold">{{ blog.title }}</a>
+            <h1 class="text-4xl md:text-6xl font-medium">{{ article.title }}</h1>
+            </div>
+            </div>
+            {% when 'article_author' %}
+                <div class="flex items-center justify-center">
+                    <div class="max-w-7xl text-center">
+                {% if section.settings.enable_author %}
+                    <small>{{ article.author }}</small>
+                {% endif %}
+                </div>
+                </div>
+                {% when 'article_published_date' %}
+                    <div class="flex items-center justify-center">
+                    <div class="max-w-7xl text-center">
+                    {% if section.settings.enable_published_date %}
+                        <time datetime="{{ article.published_at | date: format: 'on_date' }}">{{ article.published_at | date: format: 'on_date' }}</time>
+                    {% endif %}
+                    </div>
+                    </div>
+                    {% when 'featured_image' %}
+                        <div class="max-w-7xl bg-blue-100 rounded-lg mx-2 md:mx-auto overflow-hidden my-4">
+                            {% if article.image != blank %}
+                                <img class="w-full h-80 md:h-96 object-cover object-center" src="{{ article.image | img_url: 'large' }}" alt="{{ article.image.alt }}">
+                                {% else %}
+                                    {% assign placeholder_image = 'lifestyle-2' %}
+                                    {{ placeholder_image | placeholder_svg_tag: 'w-full h-80 md:h-96 object-cover object-center p-5' }}
+                            {% endif %}
+                        </div>
+                    {% when 'article_content' %}
+                        <div class="flex items-center justify-center">
+                            <div class="max-w-4xl">
+                                {{ article.content }}
+                            </div>
+                        </div>
+        {% else %}
+            
+    {% endcase %}
+    
+{% endfor %}
+</article>
+
+{% if blog.comments_enabled? %}
+    <div id="comments" class="my-8">
+        {% if article.comments_count > 0 %}
+            {% else %}
+                There are no comments in this article
+        {% endif %}
+    </div>
+
+    <div id="comment_form" class="mb-8">
+        {% form 'new_comment', article %}
+            <div class="flex-1 mx-auto items-center justify-center max-w-4xl px-4">
+                <div class="px-1 md:flex mb-3">
+                    <div class="px-3 md:w-1/2">
+                        <label for="comment_author" class="text-gray-700 font-medium uppercase text-xs mb-2">Name</label>
+                        <input 
+                        type="text" 
+                        name="comment[author]" 
+                        id="comment_author" 
+                        class="w-full text-gray-700 border py-3 px-4 mb-3 focus:outline-none"  
+                        placeholder="Jane Doe" 
+                        required>
+                        
+                    </div>
+
+                    <div class="px-3 md:w-1/2">
+                        <label for="comment_email" class="text-gray-700 font-medium uppercase text-xs mb-2">Email</label>
+                        <input 
+                        type="email" 
+                        name="comment[email]" 
+                        id="comment_email" 
+                        class="w-full text-gray-700 border py-3 px-4 mb-3 focus:outline-none"  
+                        placeholder="Jane@Doe.com" 
+                        required>
+                        
+                    </div>
+                </div>
+                <div class="px-1 md:flex mb-3">
+                    <div class="md:w-full px-3">
+                        <label for="comment_content" class="text-gray-700 font-medium uppercase text-xs mb-2">Comment</label>
+                        <textarea class="w-full text-gray-700 resize-none h-20 py-2 px-3 focus:outline-none border" name="comment[body]" id="comment_content" required></textarea>
+                    </div>
+                </div>
+                <div class="px-1 md:flex mb-3">
+                    <div class="md:w-full px-3">
+                        <input type="submit" class="w-full cursor-pointer px-4 py-2 border text-base font-medium text-white bg-gray-900 hover:bg-gray-500"></input>
+                    </div>
+                </div>
+            </div>
+            
+        {% endform %}
+    </div>
+    
+{% endif %}
+
+    
+
+
+
+
+{% schema %}
+{
+    "name": "Template Article",
+    "settings": [
+        {
+            "type": "checkbox",
+            "id": "enable_author",
+            "default": true,
+            "label": "Display Author Name"
+        },
+        {
+            "type": "checkbox",
+            "id": "enable_published_date",
+            "default": true,
+            "label": "Display Published Name"
+        }
+        ],
+        "blocks": [
+            {
+                "type": "article_title",
+                "name": "Title",
+                "limit": 1
+            },
+            {
+                "type": "article_author",
+                "name": "Author",
+                "limit": 1
+            },
+            {
+                "type": "article_published_date",
+                "name": "Published Date",
+                "limit": 1
+            },
+            {
+                "type": "featured_image",
+                "name": "Thumbnail",
+                "limit": 1
+            },
+            {
+                "type": "article_content",
+                "name": "Content",
+                "limit": 1
+            }
+        ]
+}
+{% endschema %}
